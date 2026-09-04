@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parque de Aventura · Laguna Experience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#12331A; --mid:#2F5C2C; --sand:#F6F4EA; --sand2:#EAF0E1; --ink:#152016;
+  --accent:#5B8A3A; --accent-dark:#466C2C; --ok:#4C9A6A; --bad:#C24A3A; --warn:#C98A2B;
+  --line:#DCE4D0; --radius:14px; font-family:'Inter',sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--sand);color:var(--ink);}
+h1,h2,h3{font-family:'Fraunces',serif;margin:0;}
+header.app{background:linear-gradient(135deg,var(--deep),var(--mid));color:#fff;padding:28px 6vw 42px;position:relative;overflow:hidden;}
+header.app .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.75;}
+header.app h1{font-size:clamp(28px,4vw,42px);font-weight:600;margin-top:6px;}
+header.app p.sub{opacity:.85;margin-top:8px;max-width:600px;font-size:15px;}
+.wave{position:absolute;left:0;right:0;bottom:-2px;height:46px;}
+.wave svg{width:100%;height:100%;display:block;}
+main{max-width:1180px;margin:-18px auto 60px;padding:0 6vw;position:relative;z-index:2;}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:34px;}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:0 6px 18px -12px rgba(18,51,26,.2);}
+.stat .label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#6b7561;font-family:'IBM Plex Mono',monospace;}
+.stat .value{font-size:26px;font-weight:700;font-family:'Fraunces',serif;color:var(--deep);margin-top:4px;}
+section.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;margin-bottom:26px;box-shadow:0 8px 24px -18px rgba(18,51,26,.25);}
+section.panel h2{font-size:21px;color:var(--deep);margin-bottom:4px;}
+section.panel .desc{color:#6b7561;font-size:13.5px;margin-bottom:18px;}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--sand2);cursor:pointer;transition:.15s;}
+.card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.card.active{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px var(--accent) inset;}
+.card.suspendida{opacity:.7;border-style:dashed;}
+.card h3{font-size:16px;color:var(--deep);}
+.card .meta{font-size:12.5px;color:#6b7561;margin-top:8px;line-height:1.5;}
+table{width:100%;border-collapse:collapse;font-size:14px;}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#6b7561;}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;font-family:'IBM Plex Mono',monospace;}
+.badge.ok{background:#e5f3ea;color:var(--ok);}
+.badge.bad{background:#fbe8e4;color:var(--bad);}
+.badge.warn{background:#fdf0dd;color:var(--warn);}
+form.grid-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;align-items:end;}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--deep);margin-bottom:5px;}
+select,input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;}
+select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+button{cursor:pointer;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:13.5px;font-family:'Inter',sans-serif;}
+button.primary{background:var(--accent);color:#fff;}
+button.primary:hover{background:var(--accent-dark);}
+button.warnbtn{background:var(--warn);color:#fff;}
+button.small{padding:6px 12px;font-size:12.5px;}
+.msg{padding:10px 14px;border-radius:8px;font-size:13.5px;margin-top:12px;display:none;}
+.msg.show{display:block;}
+.msg.ok{background:#e5f3ea;color:var(--ok);border:1px solid #c1e2cd;}
+.msg.bad{background:#fbe8e4;color:var(--bad);border:1px solid #f1c3ba;}
+.toast-wrap{position:fixed;top:18px;right:18px;z-index:99;display:flex;flex-direction:column;gap:8px;}
+.toast{padding:12px 16px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:0 8px 20px -8px rgba(0,0,0,.3);animation:slidein .2s ease;}
+.toast.ok{background:var(--ok);color:#fff;}
+.toast.bad{background:var(--bad);color:#fff;}
+@keyframes slidein{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+footer{text-align:center;font-size:12px;color:#7c8672;padding:20px;font-family:'IBM Plex Mono',monospace;}
+.eq-actions{display:flex;gap:6px;flex-wrap:wrap;}
+@media(max-width:640px){.dash{grid-template-columns:repeat(2,1fr);} form.grid-form{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<header class="app">
+  <div class="eyebrow">Laguna Experience · Módulo de altura y aventura</div>
+  <h1>Parque de Aventura</h1>
+  <p class="sub">Tirolesa, escalada, puentes y circuitos de obstáculos. Cada reserva valida requisitos físicos, cupos y equipamiento de seguridad, y respeta las suspensiones por clima.</p>
+  <div class="wave"><svg viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0,30 C150,60 350,0 600,30 C850,60 1050,0 1200,30 L1200,60 L0,60 Z" fill="#F6F4EA"/></svg></div>
+</header>
+
+<main>
+  <div class="dash" id="dash"></div>
+
+  <section class="panel">
+    <h2>Atracciones</h2>
+    <p class="desc">Requisitos de edad, altura y peso, cupos, equipamiento de seguridad y estado climático simulado.</p>
+    <div class="grid-cards" id="atrCards"></div>
+    <div id="atrDetail" style="margin-top:20px;"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Nueva reserva</h2>
+    <p class="desc">Se valida edad, altura, peso, cupo disponible, equipamiento de seguridad habilitado y que la atracción no esté suspendida por clima.</p>
+    <form class="grid-form" id="resForm">
+      <div><label for="rAtr">Atracción</label><select id="rAtr" required></select></div>
+      <div><label for="rHor">Horario</label><select id="rHor" required></select></div>
+      <div><label for="rVis">Visitante</label><select id="rVis" required></select></div>
+      <div><label for="rEdad">Edad (años)</label><input type="number" id="rEdad" value="20" min="1" max="99" required></div>
+      <div><label for="rAltura">Altura (cm)</label><input type="number" id="rAltura" value="170" min="80" max="220" required></div>
+      <div><label for="rPeso">Peso (kg)</label><input type="number" id="rPeso" value="70" min="10" max="200" required></div>
+      <div><button type="submit" class="primary">Crear reserva</button></div>
+    </form>
+    <div class="msg" id="resMsg"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Reservas</h2>
+    <div style="overflow-x:auto;">
+    <table id="tablaRes">
+      <thead><tr><th>ID</th><th>Atracción</th><th>Horario</th><th>Visitante</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    </div>
+  </section>
+</main>
+
+<footer>Laguna Experience — Parque de Aventura — datos de demostración</footer>
+
+<script>
+// ---------- DATOS DE EJEMPLO ----------
+const atracciones = [
+  {id:'AT1', nombre:'Tirolesa Cóndor', edadMin:12, alturaMin:140, pesoMin:35, pesoMax:110, capacidad:4, cupoRestante:4, seguridadHabilitada:true, suspendida:false, horarios:['10:00','12:00','15:00']},
+  {id:'AT2', nombre:'Muro de escalada', edadMin:8, alturaMin:120, pesoMin:25, pesoMax:130, capacidad:6, cupoRestante:6, seguridadHabilitada:true, suspendida:false, horarios:['09:30','11:30','14:00','16:00']},
+  {id:'AT3', nombre:'Puentes colgantes', edadMin:10, alturaMin:130, pesoMin:30, pesoMax:120, capacidad:5, cupoRestante:5, seguridadHabilitada:false, suspendida:false, horarios:['10:30','13:00','16:30']},
+  {id:'AT4', nombre:'Circuito de obstáculos', edadMin:14, alturaMin:150, pesoMin:40, pesoMax:115, capacidad:4, cupoRestante:2, seguridadHabilitada:true, suspendida:false, horarios:['09:00','12:30','15:30']},
+];
+
+let visitantes = [
+  {id:'V1', nombre:'Ana Gómez', pulsera:'PUL-1001', puntos:0},
+  {id:'V2', nombre:'Luis Fernández', pulsera:'PUL-1002', puntos:0},
+  {id:'V3', nombre:'Carla Núñez', pulsera:'PUL-1003', puntos:0},
+];
+
+let reservas = [];
+let resCounter = 0;
+let selectedAtrId = atracciones[0].id;
+
+// ---------- UTILIDADES ----------
+function showToast(text, type){
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div'); t.className='toast '+type; t.textContent=text;
+  wrap.appendChild(t); setTimeout(()=>t.remove(),3200);
+}
+function showMsg(id,text,ok){
+  const el = document.getElementById(id);
+  el.textContent = text; el.className = 'msg show ' + (ok?'ok':'bad');
+}
+
+// ---------- RENDER ----------
+function renderDash(){
+  const suspendidas = atracciones.filter(a=>a.suspendida).length;
+  const cupos = atracciones.reduce((s,a)=>s+a.cupoRestante,0);
+  document.getElementById('dash').innerHTML = `
+    <div class="stat"><div class="label">Atracciones</div><div class="value">${atracciones.length}</div></div>
+    <div class="stat"><div class="label">Reservas activas</div><div class="value">${reservas.filter(r=>r.estado==='confirmada'||r.estado==='realizada').length}</div></div>
+    <div class="stat"><div class="label">Cupos libres</div><div class="value">${cupos}</div></div>
+    <div class="stat"><div class="label">Suspendidas por clima</div><div class="value">${suspendidas}</div></div>
+  `;
+}
+
+function renderAtrCards(){
+  const wrap = document.getElementById('atrCards');
+  wrap.innerHTML = atracciones.map(a=>`
+    <div class="card ${a.id===selectedAtrId?'active':''} ${a.suspendida?'suspendida':''}" data-id="${a.id}">
+      <h3>${a.nombre} ${a.suspendida?'<span class="badge warn">Suspendida</span>':''}</h3>
+      <div class="meta">
+        Edad ≥ ${a.edadMin} · Altura ≥ ${a.alturaMin}cm · Peso ${a.pesoMin}-${a.pesoMax}kg<br>
+        Cupos: ${a.cupoRestante}/${a.capacidad}<br>
+        Seguridad: <span class="badge ${a.seguridadHabilitada?'ok':'bad'}">${a.seguridadHabilitada?'Habilitada':'No habilitada'}</span>
+      </div>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('.card').forEach(c=>c.addEventListener('click', ()=>{
+    selectedAtrId = c.dataset.id; renderAtrCards(); renderAtrDetail();
+  }));
+  renderAtrDetail();
+}
+
+function renderAtrDetail(){
+  const a = atracciones.find(x=>x.id===selectedAtrId);
+  document.getElementById('atrDetail').innerHTML = `
+    <h3 style="color:var(--deep);font-size:16px;margin-bottom:10px;">Control climático y seguridad — ${a.nombre}</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <span class="badge ${a.suspendida?'warn':'ok'}">${a.suspendida?'Suspendida por clima':'Operativa'}</span>
+      <span class="badge ${a.seguridadHabilitada?'ok':'bad'}">Equipo seguridad: ${a.seguridadHabilitada?'habilitado':'no habilitado'}</span>
+      <button class="small warnbtn" onclick="simularClima('${a.id}')">Simular tormenta</button>
+      <button class="small primary" onclick="restaurarClima('${a.id}')">Restaurar clima</button>
+      <button class="small" style="background:${a.seguridadHabilitada?'#fbe8e4':'#e5f3ea'};color:${a.seguridadHabilitada?'var(--bad)':'var(--ok)'};" onclick="toggleSeguridad('${a.id}')">${a.seguridadHabilitada?'Deshabilitar equipo':'Habilitar equipo'}</button>
+    </div>
+  `;
+}
+
+function fillSelects(){
+  const rAtr = document.getElementById('rAtr');
+  rAtr.innerHTML = atracciones.map(a=>`<option value="${a.id}">${a.nombre}</option>`).join('');
+  const rVis = document.getElementById('rVis');
+  rVis.innerHTML = visitantes.map(v=>`<option value="${v.id}">${v.nombre} — ${v.pulsera}</option>`).join('');
+  fillHorarios();
+  rAtr.addEventListener('change', fillHorarios);
+}
+function fillHorarios(){
+  const a = atracciones.find(x=>x.id===document.getElementById('rAtr').value);
+  document.getElementById('rHor').innerHTML = a.horarios.map(h=>`<option value="${h}">${h}</option>`).join('');
+}
+
+function renderReservas(){
+  const tbody = document.querySelector('#tablaRes tbody');
+  tbody.innerHTML = reservas.slice().reverse().map(r=>{
+    let acciones = '';
+    if(r.estado==='confirmada') acciones += `<button class="small primary" onclick="registrarRealizacion('${r.id}')">Registrar realización</button>`;
+    if(r.estado==='suspendida') acciones += `<button class="small primary" onclick="reprogramar('${r.id}')">Reprogramar</button> <button class="small" style="background:#fbe8e4;color:var(--bad);" onclick="cancelar('${r.id}')">Cancelar</button>`;
+    if(r.estado==='realizada') acciones = '<span class="badge ok">Completada</span>';
+    if(r.estado==='cancelada') acciones = '<span class="badge bad">Cancelada</span>';
+    return `<tr>
+      <td>${r.id}</td><td>${r.atrNombre}</td><td>${r.horario}</td><td>${r.visNombre}</td>
+      <td><span class="badge ${r.estado==='confirmada'?'ok':r.estado==='suspendida'?'warn':r.estado==='cancelada'?'bad':'ok'}">${r.estado}</span></td>
+      <td class="eq-actions">${acciones}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" style="color:#7c8672;">Sin reservas todavía.</td></tr>';
+}
+
+function renderAll(){ renderDash(); renderAtrCards(); renderReservas(); }
+
+// ---------- LÓGICA DE NEGOCIO: CREAR RESERVA ----------
+document.getElementById('resForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const atrId = document.getElementById('rAtr').value;
+  const horario = document.getElementById('rHor').value;
+  const visId = document.getElementById('rVis').value;
+  const edad = parseInt(document.getElementById('rEdad').value,10);
+  const altura = parseInt(document.getElementById('rAltura').value,10);
+  const peso = parseInt(document.getElementById('rPeso').value,10);
+
+  const a = atracciones.find(x=>x.id===atrId);
+  const vis = visitantes.find(x=>x.id===visId);
+
+  // REGLA: suspendida por clima
+  if(a.suspendida){
+    showMsg('resMsg', `No se puede reservar: "${a.nombre}" está suspendida por condiciones climáticas.`, false);
+    showToast('Atracción suspendida por clima', 'bad');
+    return;
+  }
+  // REGLA: equipamiento de seguridad habilitado
+  if(!a.seguridadHabilitada){
+    showMsg('resMsg', `No se puede reservar: el equipamiento de seguridad de "${a.nombre}" no está habilitado.`, false);
+    showToast('Equipo de seguridad no habilitado', 'bad');
+    return;
+  }
+  // REGLA: requisitos de edad/altura/peso
+  const problemas = [];
+  if(edad < a.edadMin) problemas.push(`edad mínima ${a.edadMin} años`);
+  if(altura < a.alturaMin) problemas.push(`altura mínima ${a.alturaMin}cm`);
+  if(peso < a.pesoMin || peso > a.pesoMax) problemas.push(`peso entre ${a.pesoMin}-${a.pesoMax}kg`);
+  if(problemas.length){
+    showMsg('resMsg', `Reserva rechazada: el visitante no cumple requisitos (${problemas.join(', ')}).`, false);
+    showToast('No cumple requisitos', 'bad');
+    return;
+  }
+  // REGLA: capacidad / cupos
+  if(a.cupoRestante <= 0){
+    showMsg('resMsg', `Reserva rechazada: "${a.nombre}" alcanzó su capacidad máxima.`, false);
+    showToast('Sin cupos disponibles', 'bad');
+    return;
+  }
+
+  a.cupoRestante -= 1;
+  resCounter++;
+  const reserva = {
+    id:'R-'+String(resCounter).padStart(4,'0'),
+    atrId, atrNombre:a.nombre, horario, visId, visNombre:vis.nombre,
+    pago:'Aprobado', pulsera:vis.pulsera, estado:'confirmada'
+  };
+  reservas.push(reserva);
+  showMsg('resMsg', `Reserva ${reserva.id} confirmada para "${a.nombre}" a las ${horario}. Pago registrado, pulsera ${vis.pulsera} asociada.`, true);
+  showToast('Reserva creada', 'ok');
+  renderAll();
+});
+
+// ---------- CICLO DE VIDA ----------
+function registrarRealizacion(id){
+  const r = reservas.find(x=>x.id===id);
+  const a = atracciones.find(x=>x.id===r.atrId);
+  if(a.suspendida){
+    r.estado = 'suspendida';
+    showToast('La atracción se suspendió por clima antes de la actividad', 'bad');
+    renderAll();
+    return;
+  }
+  r.estado = 'realizada';
+  const vis = visitantes.find(v=>v.id===r.visId);
+  vis.puntos += 15;
+  showToast(`Actividad realizada. +15 puntos para ${vis.nombre}`, 'ok');
+  renderAll();
+}
+function cancelar(id){
+  const r = reservas.find(x=>x.id===id);
+  const a = atracciones.find(x=>x.id===r.atrId);
+  a.cupoRestante += 1;
+  r.estado = 'cancelada';
+  showToast(`Reserva ${r.id} cancelada, cupo liberado`, 'ok');
+  renderAll();
+}
+function reprogramar(id){
+  const r = reservas.find(x=>x.id===id);
+  const a = atracciones.find(x=>x.id===r.atrId);
+  if(a.suspendida){ showToast('La atracción sigue suspendida, esperá a que se restaure el clima', 'bad'); return; }
+  r.estado = 'confirmada';
+  showToast(`Reserva ${r.id} reprogramada`, 'ok');
+  renderAll();
+}
+
+// ---------- SIMULACIÓN CLIMÁTICA / SEGURIDAD ----------
+function simularClima(atrId){
+  const a = atracciones.find(x=>x.id===atrId);
+  a.suspendida = true;
+  // suspende automáticamente las reservas confirmadas de esa atracción
+  reservas.filter(r=>r.atrId===atrId && r.estado==='confirmada').forEach(r=>{ r.estado='suspendida'; });
+  showToast(`Tormenta simulada: "${a.nombre}" suspendida por clima`, 'bad');
+  renderAll();
+}
+function restaurarClima(atrId){
+  const a = atracciones.find(x=>x.id===atrId);
+  a.suspendida = false;
+  showToast(`Clima restaurado para "${a.nombre}"`, 'ok');
+  renderAll();
+}
+function toggleSeguridad(atrId){
+  const a = atracciones.find(x=>x.id===atrId);
+  a.seguridadHabilitada = !a.seguridadHabilitada;
+  showToast(`Equipo de seguridad de "${a.nombre}" ahora ${a.seguridadHabilitada?'habilitado':'no habilitado'}`, a.seguridadHabilitada?'ok':'bad');
+  renderAll();
+}
+
+// ---------- INIT ----------
+fillSelects();
+renderAll();
+</script>
+</body>
+</html>
